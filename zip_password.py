@@ -30,7 +30,6 @@ def getPassword():
             print('パスワードが一致しました  パスワードは忘れないようにしてください')
             return password.encode()
         else:
-            counter += 1
             print('パスワードが一致しません')
             print('----------------------------------------------------------')
             password = ""
