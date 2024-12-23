@@ -19,16 +19,19 @@ def getPassword():
 
     for counter in range(exit_range):
         print('パスワードを入力してください')
-        password = getpass.getpass().encode()
+        password = getpass.getpass()
         print('確認のためもう一度同じパスワードを入力してください')
-        re_password = getpass.getpass().encode()
+        re_password = getpass.getpass()
 
-        if password == re_password:
+        if password == "" or password == "":
+            print('パスワードが未入力です')
+            print('----------------------------------------------------------')
+        elif password == re_password:
             print('パスワードが一致しました  パスワードは忘れないようにしてください')
-            return password
+            return password.encode()
         else:
             counter += 1
-            print('パスワードが一致しません  ' + str(counter) + '回目の入力に失敗しました')
+            print('パスワードが一致しません')
             print('----------------------------------------------------------')
             password = ""
             re_password = ""
