@@ -9,7 +9,7 @@ def is_hankaku(password):
     return any(re.match(r'[^\x00-\x7F]', char) for char in password)
 
 def create_zip(full_file_path, password):
-    output_dir = "./zip/"
+    output_dir = os.path.expanduser("~/ZipPassword")
     os.makedirs(output_dir, exist_ok=True)
     zip_file_name = output_dir / Path(full_file_path.name + ".zip")
     with pyzipper.AESZipFile(zip_file_name, 'w', encryption=pyzipper.WZ_AES) as zipf:
@@ -47,7 +47,7 @@ def startZip():
         exit()
 
     result = messagebox.askyesno('圧縮を実行しますか？','次のフォルダにあるファイルをzipファイルに変換しますか\n' + folder_path)
-    if result == False:
+    if not result:
         exit()
 
     files = os.listdir(folder_path)
