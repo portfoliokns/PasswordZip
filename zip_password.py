@@ -1,8 +1,7 @@
 import os
-from tkinter import Tk
+from tkinter import Tk, messagebox, simpledialog, Toplevel
 from tkinter.filedialog import askdirectory
 import pyzipper
-import getpass
 from pathlib import Path
 import re
 
@@ -10,57 +9,54 @@ def is_hankaku(password):
     return any(re.match(r'[^\x00-\x7F]', char) for char in password)
 
 def create_zip(full_file_path, password):
-    output_dir = "./zip/"
+    output_dir = os.path.expanduser("~/ZipPassword")
     os.makedirs(output_dir, exist_ok=True)
     zip_file_name = output_dir / Path(full_file_path.name + ".zip")
-    print('圧縮中：' + str(full_file_path.name))
     with pyzipper.AESZipFile(zip_file_name, 'w', encryption=pyzipper.WZ_AES) as zipf:
         zipf.setpassword(password)
-        zipf.write(full_file_path, arcname=full_file_path)
+        zipf.write(full_file_path, arcname=os.path.basename(full_file_path))
 
 def getPassword():
-    
     exit_range = 3
     for counter in range(exit_range):
-        print('パスワードを入力してください')
-        password = getpass.getpass()
-        print('確認のためもう一度同じパスワードを入力してください')
-        re_password = getpass.getpass()
+        password = simpledialog.askstring("パスワード入力","パスワードを入力してください\n必ず半角英数字記号で入力してください")
+        re_password = simpledialog.askstring("パスワード再入力","パスワードをもう一度入力してください\n必ず半角英数字記号で入力してください")
 
         if password != re_password:
-            print('パスワードが一致しません  2回同じパスワードを設定してください')
+            messagebox.showerror("パスワード不一致", "パスワードが一致しません\n2回同じパスワードを設定してください")
         elif password == "":
-            print('パスワードが未入力です')
+            messagebox.showerror("パスワード未入力", "パスワードが空になっています\nパスワードを入力してください")
         elif is_hankaku(password):
-            print('パスワードに全角が含まれています  半角で入力してください')
+            messagebox.showerror("全角は登録できません", "パスワードに全角が含まれています\n半角で入力してください")
         elif password == re_password:
-            print('パスワードが一致しました  パスワードは忘れないようにしてください')
             return password.encode()
         else:
-            print('パスワードが一致しません')
-
-        print('----------------------------------------------------------')
+            messagebox.showerror("パスワード不一致", "パスワードが一致しません")
 
 def startZip():
     root = Tk()
     root.withdraw()
+
     folder_path = askdirectory()
     if not folder_path:
-        print('処理を中止します。')
         exit()
 
     password = getPassword()
     if password == None:
-        print('パスワードの入力に失敗しました  終了します')
+        messagebox.showerror("エラー", "パスワードの入力に失敗しました\n終了します")
         exit()
 
-    print('圧縮を開始します')
+    result = messagebox.askyesno('圧縮を実行しますか？','次のフォルダにあるファイルをzipファイルに変換しますか\n' + folder_path)
+    if not result:
+        exit()
+
     files = os.listdir(folder_path)
     files.sort()
     for file in files:
         full_file_path = Path(os.path.join(folder_path, file))
         create_zip(full_file_path, password)
-    print('圧縮を終了します')
+
+    messagebox.showinfo("圧縮が完了しました", "すべてのファイルの圧縮に成功しました")
 
 if __name__ == "__main__":
     startZip()

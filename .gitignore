@@ -1,2 +1,6 @@
 venv
 zip/
+.DS_store
+/build/
+/dist/
+*.spec
