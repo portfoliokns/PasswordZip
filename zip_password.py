@@ -103,6 +103,10 @@ def startZip():
     if password == None:
         exit()
 
+    result = messagebox.askyesno('圧縮を実行しますか？','次のフォルダにあるファイルをzipファイルに変換しますか\n' + folder_path)
+    if not result:
+        exit()
+
     files = os.listdir(folder_path)
     files.sort()
     for file in files:
